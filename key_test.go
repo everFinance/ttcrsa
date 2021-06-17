@@ -6,7 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
-	"github.com/everFinance/tcrsa"
+	"github.com/everFinance/ttcrsa"
 	"math/big"
 	"testing"
 )

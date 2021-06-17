@@ -5,7 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"fmt"
-	"github.com/everFinance/tcrsa"
+	"github.com/everFinance/ttcrsa"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

@@ -1,4 +1,4 @@
-module github.com/everFinance/tcrsa
+module github.com/everFinance/ttcrsa
 
 go 1.12
 
