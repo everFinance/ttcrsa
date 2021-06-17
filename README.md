@@ -1,5 +1,5 @@
 # Golang Threshold Cryptography Library - RSA implementation 
-[![Go Report Card](https://goreportcard.com/badge/github.com/niclabs/tcrsa)](https://goreportcard.com/report/github.com/niclabs/tcrsa) [![Build Status](https://travis-ci.org/niclabs/tcrsa.svg?branch=master)](https://travis-ci.org/niclabs/tcrsa) [![GoDoc](https://godoc.org/github.com/niclabs/libtc-rsa?status.svg)](https://godoc.org/github.com/niclabs/tcrsa)
+[![Go Report Card](https://goreportcard.com/badge/github.com/everFinance/tcrsa)](https://goreportcard.com/report/github.com/everFinance/tcrsa) [![Build Status](https://travis-ci.org/niclabs/tcrsa.svg?branch=master)](https://travis-ci.org/niclabs/tcrsa) [![GoDoc](https://godoc.org/github.com/niclabs/libtc-rsa?status.svg)](https://godoc.org/github.com/everFinance/tcrsa)
 
 This library implements the cryptographic algorithms of Victor Shoup's paper [Practical Threshold Signatures](http://www.iacr.org/archive/eurocrypt2000/1807/18070209-new.pdf) in the Golang programming language. 
 
@@ -12,7 +12,7 @@ Due to Golang extensive standard library, this implementation does not have exte
 ### Installing
 
 ```shell
-go get https://github.com/niclabs/tcrsa
+go get https://github.com/everFinance/tcrsa
 ```
 
 To run the tests you just need to use `go test`:
