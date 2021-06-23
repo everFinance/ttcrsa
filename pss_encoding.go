@@ -2,12 +2,10 @@ package tcrsa
 
 import (
 	"crypto"
-	"crypto/rand"
 	"crypto/rsa"
 	"errors"
 	"fmt"
 	"hash"
-	"io"
 )
 
 // This method was copied from SignPSS function from crypto/rsa on https://golang.org/pkg/crypto/rsa/
@@ -22,9 +20,9 @@ func PreparePssDocumentHash(privateKeySize int, hash crypto.Hash, hashed []byte,
 	}
 
 	salt := make([]byte, saltLength)
-	if _, err := io.ReadFull(rand.Reader, salt); err != nil {
-		return nil, err
-	}
+	// if _, err := io.ReadFull(rand.Reader, salt); err != nil {
+	// 	return nil, err
+	// }
 
 	nBits := privateKeySize
 	em, err := emsaPSSEncode(hashed, nBits-1, salt, hash.New())
