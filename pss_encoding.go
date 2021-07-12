@@ -41,8 +41,7 @@ func PreparePssDocumentHash(privateKeySize int, hashed []byte, salt []byte, opts
 	}
 
 	nBits := privateKeySize
-	em, err := emsaPSSEncode(hashed, nBits-1, salt, hashType.New())
-	return em, err
+	return emsaPSSEncode(hashed, nBits-1, salt, hashType.New())
 }
 
 func emsaPSSEncode(mHash []byte, emBits int, salt []byte, hash hash.Hash) ([]byte, error) {
