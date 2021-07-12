@@ -4,6 +4,7 @@ import (
 	"crypto"
 	"crypto/rsa"
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"github.com/everFinance/ttcrsa"
 	"github.com/stretchr/testify/assert"
@@ -77,6 +78,7 @@ func TestKeyShare_Sign_PssDoc(t *testing.T) {
 	assert.NoError(t, err)
 	sigShares := make(tcrsa.SigShareList, l)
 
+	t.Log("doc01: ", hex.EncodeToString(docPSS))
 	var i uint16
 
 	for i = 0; i < l; i++ {
@@ -91,4 +93,26 @@ func TestKeyShare_Sign_PssDoc(t *testing.T) {
 
 	err = rsa.VerifyPSS(keyMeta.PublicKey, crypto.SHA256, docHash[:], signature, nil)
 	assert.NoError(t, err)
+	t.Log("signature01: ", hex.EncodeToString(signature))
+
+	// power test
+	docPSS, err = tcrsa.PreparePssDocumentHash(keyMeta.PublicKey.N.BitLen(), crypto.SHA256, docHash[:], nil)
+	assert.NoError(t, err)
+	sigShares = make(tcrsa.SigShareList, l)
+	t.Log("doc02: ", hex.EncodeToString(docPSS))
+
+	for i = 0; i < l; i++ {
+		sigShares[i], err = keyShares[i].Sign(docPSS, crypto.SHA256, keyMeta)
+		assert.NoError(t, err)
+		err = sigShares[i].Verify(docPSS, keyMeta)
+		assert.NoError(t, err)
+	}
+
+	signature, err = sigShares.Join(docPSS, keyMeta)
+	assert.NoError(t, err)
+
+	err = rsa.VerifyPSS(keyMeta.PublicKey, crypto.SHA256, docHash[:], signature, nil)
+	assert.NoError(t, err)
+
+	t.Log("signature02: ", hex.EncodeToString(signature))
 }
