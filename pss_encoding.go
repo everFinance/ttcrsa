@@ -2,31 +2,46 @@ package tcrsa
 
 import (
 	"crypto"
+	"crypto/rand"
 	"crypto/rsa"
 	"errors"
 	"fmt"
 	"hash"
+	"io"
 )
 
 // This method was copied from SignPSS function from crypto/rsa on https://golang.org/pkg/crypto/rsa/
-func PreparePssDocumentHash(privateKeySize int, hash crypto.Hash, hashed []byte, opts *rsa.PSSOptions) ([]byte, error) {
-	saltLength := (privateKeySize+7)/8 - 2 - hash.Size()
-
-	if saltLength <= 0 {
-		return nil, fmt.Errorf("message too long")
-	}
+func PreparePssDocumentHash(privateKeySize int, hashed []byte, salt []byte, opts *rsa.PSSOptions) ([]byte, error) {
+	hashType := crypto.SHA256
 	if opts != nil && opts.Hash != 0 {
-		hash = opts.Hash
+		hashType = opts.Hash
+	}
+	if salt == nil {
+		saltLength := saltLen(opts)
+
+		switch saltLength {
+		case rsa.PSSSaltLengthAuto:
+			saltLength = (privateKeySize+7)/8 - 2 - hashType.Size()
+		case rsa.PSSSaltLengthEqualsHash:
+			saltLength = hashType.Size()
+		}
+
+		if saltLength <= 0 {
+			return nil, fmt.Errorf("message too long")
+		}
+
+		salt = make([]byte, saltLength)
+		if _, err := io.ReadFull(rand.Reader, salt); err != nil {
+			return nil, err
+		}
 	}
 
-	salt := make([]byte, saltLength)
-	// if _, err := io.ReadFull(rand.Reader, salt); err != nil {
-	// 	return nil, err
-	// }
+	if len(salt) < hashType.Size() {
+		return nil, errors.New("salt length too short")
+	}
 
-	nBits := privateKeySize
-	em, err := emsaPSSEncode(hashed, nBits-1, salt, hash.New())
-	return em, err
+	emBits := privateKeySize - 1
+	return emsaPSSEncode(hashed, emBits, salt, hashType.New())
 }
 
 func emsaPSSEncode(mHash []byte, emBits int, salt []byte, hash hash.Hash) ([]byte, error) {
@@ -135,4 +150,11 @@ func mgf1XOR(out []byte, hash hash.Hash, seed []byte) {
 		}
 		incCounter(&counter)
 	}
+}
+
+func saltLen(opts *rsa.PSSOptions) int {
+	if opts == nil {
+		return rsa.PSSSaltLengthAuto
+	}
+	return opts.SaltLength
 }
