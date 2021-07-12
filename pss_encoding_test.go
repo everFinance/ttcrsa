@@ -15,7 +15,7 @@ func TestPreparePssDocumentHash(t *testing.T) {
 	)
 
 	docHash := sha256.Sum256([]byte(pssEncodeTestMessage))
-	docPss, err := PreparePssDocumentHash(pssEncodingLeyLength, crypto.SHA256, docHash[:], &rsa.PSSOptions{
+	docPss, err := PreparePssDocumentHash(pssEncodingLeyLength, crypto.SHA256, docHash[:], nil, &rsa.PSSOptions{
 		SaltLength: 0,
 		Hash:       crypto.SHA256,
 	})

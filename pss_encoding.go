@@ -11,26 +11,28 @@ import (
 )
 
 // This method was copied from SignPSS function from crypto/rsa on https://golang.org/pkg/crypto/rsa/
-func PreparePssDocumentHash(privateKeySize int, hash crypto.Hash, hashed []byte, opts *rsa.PSSOptions) ([]byte, error) {
-	saltLength := saltLen(opts)
+func PreparePssDocumentHash(privateKeySize int, hash crypto.Hash, hashed []byte, salt []byte, opts *rsa.PSSOptions) ([]byte, error) {
+	if salt == nil {
+		saltLength := saltLen(opts)
 
-	switch saltLength {
-	case rsa.PSSSaltLengthAuto:
-		saltLength = (privateKeySize+7)/8 - 2 - hash.Size()
-	case rsa.PSSSaltLengthEqualsHash:
-		saltLength = hash.Size()
-	}
+		switch saltLength {
+		case rsa.PSSSaltLengthAuto:
+			saltLength = (privateKeySize+7)/8 - 2 - hash.Size()
+		case rsa.PSSSaltLengthEqualsHash:
+			saltLength = hash.Size()
+		}
 
-	if saltLength <= 0 {
-		return nil, fmt.Errorf("message too long")
-	}
-	if opts != nil && opts.Hash != 0 {
-		hash = opts.Hash
-	}
+		if saltLength <= 0 {
+			return nil, fmt.Errorf("message too long")
+		}
+		if opts != nil && opts.Hash != 0 {
+			hash = opts.Hash
+		}
 
-	salt := make([]byte, saltLength)
-	if _, err := io.ReadFull(rand.Reader, salt); err != nil {
-		return nil, err
+		salt = make([]byte, saltLength)
+		if _, err := io.ReadFull(rand.Reader, salt); err != nil {
+			return nil, err
+		}
 	}
 
 	nBits := privateKeySize
