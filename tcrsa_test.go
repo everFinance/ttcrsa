@@ -75,7 +75,7 @@ func TestKeyShare_Sign_PssDoc(t *testing.T) {
 
 	data := []byte("this is a test data 111")
 	docHash := sha256.Sum256(data)
-	docPSS, err := tcrsa.PreparePssDocumentHash(keyMeta.PublicKey.N.BitLen(), crypto.SHA256, docHash[:], salt[:], nil)
+	docPSS, err := tcrsa.PreparePssDocumentHash(keyMeta.PublicKey.N.BitLen(), docHash[:], salt[:], nil)
 	assert.NoError(t, err)
 	sigShares := make(tcrsa.SigShareList, l)
 
@@ -97,7 +97,7 @@ func TestKeyShare_Sign_PssDoc(t *testing.T) {
 	t.Log("signature01: ", hex.EncodeToString(signature))
 
 	// power test
-	docPSS, err = tcrsa.PreparePssDocumentHash(keyMeta.PublicKey.N.BitLen(), crypto.SHA256, docHash[:], salt[:], nil)
+	docPSS, err = tcrsa.PreparePssDocumentHash(keyMeta.PublicKey.N.BitLen(), docHash[:], salt[:], nil)
 	assert.NoError(t, err)
 	sigShares = make(tcrsa.SigShareList, l)
 	t.Log("doc02: ", hex.EncodeToString(docPSS))

@@ -11,22 +11,23 @@ import (
 )
 
 // This method was copied from SignPSS function from crypto/rsa on https://golang.org/pkg/crypto/rsa/
-func PreparePssDocumentHash(privateKeySize int, hash crypto.Hash, hashed []byte, salt []byte, opts *rsa.PSSOptions) ([]byte, error) {
+func PreparePssDocumentHash(privateKeySize int, hashed []byte, salt []byte, opts *rsa.PSSOptions) ([]byte, error) {
+	hashType := crypto.SHA256
+	if opts != nil && opts.Hash != 0 {
+		hashType = opts.Hash
+	}
 	if salt == nil {
 		saltLength := saltLen(opts)
 
 		switch saltLength {
 		case rsa.PSSSaltLengthAuto:
-			saltLength = (privateKeySize+7)/8 - 2 - hash.Size()
+			saltLength = (privateKeySize+7)/8 - 2 - hashType.Size()
 		case rsa.PSSSaltLengthEqualsHash:
-			saltLength = hash.Size()
+			saltLength = hashType.Size()
 		}
 
 		if saltLength <= 0 {
 			return nil, fmt.Errorf("message too long")
-		}
-		if opts != nil && opts.Hash != 0 {
-			hash = opts.Hash
 		}
 
 		salt = make([]byte, saltLength)
@@ -35,8 +36,12 @@ func PreparePssDocumentHash(privateKeySize int, hash crypto.Hash, hashed []byte,
 		}
 	}
 
+	if len(salt) < hashType.Size() {
+		return nil, errors.New("salt length too short")
+	}
+
 	nBits := privateKeySize
-	em, err := emsaPSSEncode(hashed, nBits-1, salt, hash.New())
+	em, err := emsaPSSEncode(hashed, nBits-1, salt, hashType.New())
 	return em, err
 }
 
